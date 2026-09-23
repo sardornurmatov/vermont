@@ -1,65 +1,18 @@
 <!DOCTYPE html>
 <html lang="uz">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vermont - Boshqaruv Paneli</title>
-  
-  <link rel="icon" type="image/png" href="images/vermont-icon.png">
-  <link rel="stylesheet" href="css/admin.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Vermont — Admin</title><link rel="stylesheet" href="css/admin.css"></head>
 <body>
-
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <img src="images/vermont-icon.png" alt="Vermont" class="admin-brand-icon">
-      <div class="sidebar-title">
-        <h2>Vermont</h2>
-        <small>Admin Panel</small>
-      </div>
-    </div>
-    
-    <nav class="sidebar-nav">
-      <a href="#dashboard" class="nav-item active" data-tab="dashboard">
-        <i class="fa-solid fa-chart-pie"></i> Statistika
-      </a>
-      <a href="#products" class="nav-item" data-tab="products">
-        <i class="fa-solid fa-box-open"></i> Mahsulotlar
-      </a>
-      <a href="#orders" class="nav-item" data-tab="orders">
-        <i class="fa-solid fa-truck-fast"></i> Buyurtmalar
-      </a>
-      <a href="#customers" class="nav-item" data-tab="customers">
-        <i class="fa-solid fa-users"></i> Mijozlar
-      </a>
-      <a href="#settings" class="nav-item" data-tab="settings">
-        <i class="fa-solid fa-gear"></i> Sozlamalar
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <button id="logoutBtn" class="logout-btn">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i> Chiqish
-      </button>
-    </div>
-  </aside>
-
-  <main class="admin-main">
-    <header class="admin-topbar">
-      <h1>Vermont Dashboard</h1>
-      <div class="admin-profile">
-        <span id="adminUsername">Administrator</span>
-      </div>
-    </header>
-
-    <section class="admin-content" id="adminContent">
-      <!-- Kontent admin.js orqali yuklanadi -->
+  <main class="admin-shell">
+    <section id="loginPanel" class="admin-card">
+      <div class="admin-logo">V</div><h1>Vermont Admin</h1><p>Davom etish uchun admin parolini kiriting.</p>
+      <form id="adminLoginForm"><input id="adminPassword" type="password" placeholder="Admin paroli" required><button type="submit">Kirish</button><div id="adminError" class="error"></div></form>
+    </section>
+    <section id="dashboardPanel" class="dashboard" hidden>
+      <header><div><p class="eyebrow">VERMONT SHOP</p><h1>Boshqaruv paneli</h1></div><button id="logoutAdmin" class="secondary">Chiqish</button></header>
+      <div id="stats" class="stats"></div>
+      <section class="panel"><div class="panel-title"><h2>Mahsulotlar</h2><button id="refreshProducts" class="secondary">Yangilash</button></div><div class="table-wrap"><table><thead><tr><th>Nomi</th><th>Narxi</th><th>Ombor</th><th>Sotilgan</th></tr></thead><tbody id="productsBody"></tbody></table></div></section>
     </section>
   </main>
-
-  <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/admin.js"></script>
+  <script src="js/config.js"></script><script src="js/store.js"></script><script src="js/admin.js"></script>
 </body>
 </html>

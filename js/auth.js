@@ -1,74 +1,82 @@
-// DASTA — admin panel uchun parol himoyasi
-//
-// Endi parol serverda (backend/.env dagi ADMIN_PASSWORD) tekshiriladi —
-// bu HAQIQIY xavfsizlik, chunki parol brauzer kodida umuman yo'q. Server
-// to'g'ri parolni tasdiqlagach JWT token qaytaradi, u sessionStorage'da
-// saqlanadi va admin API so'rovlarida Authorization header sifatida
-// yuboriladi (buni js/store.js o'z ichida avtomatik qiladi).
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('authOverlay');
+  const card = document.getElementById('authCard');
+  const openButton = document.getElementById('openAuthBtn');
+  const closeButton = document.getElementById('closeAuthBtn');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
 
-const ADMIN_TOKEN_KEY = "dasta_admin_token";
+  const open = () => overlay?.classList.add('active');
+  const close = () => overlay?.classList.remove('active');
 
-function isAdminAuthed() {
-  return Boolean(sessionStorage.getItem(ADMIN_TOKEN_KEY));
-}
-
-function logoutAdmin() {
-  sessionStorage.removeItem(ADMIN_TOKEN_KEY);
-  location.reload();
-}
-
-function initAdminGate() {
-  const gate = document.getElementById("adminGate");
-  const shell = document.querySelector(".app-shell");
-  const form = document.getElementById("gateForm");
-  const errorMsg = document.getElementById("gateError");
-  const submitBtn = form.querySelector('button[type="submit"]');
-
-  function unlock() {
-    gate.hidden = true;
-    shell.hidden = false;
-    if (typeof window.initAdminPanel === "function") window.initAdminPanel();
-  }
-
-  if (isAdminAuthed()) {
-    unlock();
-    return;
-  }
-
-  form.addEventListener("submit", async e => {
-    e.preventDefault();
-    errorMsg.hidden = true;
-    const password = document.getElementById("gatePassword").value;
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Tekshirilmoqda...";
-
-    try {
-      const res = await fetch(`${API_BASE}/auth/admin/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        errorMsg.textContent = data.error || "Parol noto'g'ri. Qayta urinib ko'ring.";
-        errorMsg.hidden = false;
-        document.getElementById("gatePassword").value = "";
-        document.getElementById("gatePassword").focus();
-        return;
+  openButton?.addEventListener('click', () => {
+    if (Store.getCurrentCustomer()) {
+      if (confirm('Hisobdan chiqishni xohlaysizmi?')) {
+        Store.logoutCustomer();
+        location.reload();
       }
+      return;
+    }
+    open();
+  });
+  closeButton?.addEventListener('click', close);
+  overlay?.addEventListener('click', (event) => {
+    if (event.target === overlay) close();
+  });
+  document.getElementById('goToRegister')?.addEventListener('click', () => card?.classList.add('flipped'));
+  document.getElementById('goToLogin')?.addEventListener('click', () => card?.classList.remove('flipped'));
 
-      sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
-      unlock();
-    } catch {
-      errorMsg.textContent = "Serverga ulanib bo'lmadi. Backend ishga tushirilganini tekshiring.";
-      errorMsg.hidden = false;
+  loginForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = loginForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      const data = await Store.loginCustomer({
+        email: document.getElementById('loginUser').value.trim(),
+        password: document.getElementById('loginPass').value,
+      });
+      Store.saveCustomerSession(data);
+      close();
+      loginForm.reset();
+      updateAccountButton();
+      showToast('Tizimga muvaffaqiyatli kirdingiz');
+    } catch (error) {
+      showToast(error.message, 'error');
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Kirish";
+      button.disabled = false;
     }
   });
-}
 
-document.addEventListener("DOMContentLoaded", initAdminGate);
+  registerForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = registerForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      const data = await Store.registerCustomer({
+        name: document.getElementById('regFullName').value.trim(),
+        email: document.getElementById('regEmail').value.trim(),
+        password: document.getElementById('regPassword').value,
+      });
+      Store.saveCustomerSession(data);
+      close();
+      registerForm.reset();
+      card?.classList.remove('flipped');
+      updateAccountButton();
+      showToast('Hisob muvaffaqiyatli yaratildi');
+    } catch (error) {
+      showToast(error.message, 'error');
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  window.updateAccountButton = function updateAccountButton() {
+    if (!openButton) return;
+    const customer = Store.getCurrentCustomer();
+    openButton.innerHTML = customer
+      ? `<i class="bi bi-person-check-fill"></i><span>${customer.name}</span>`
+      : '<i class="bi bi-person-fill"></i><span>Kirish</span>';
+  };
+
+  updateAccountButton();
+});
