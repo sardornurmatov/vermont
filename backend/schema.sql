@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS products (
   cat TEXT NOT NULL,
   name TEXT NOT NULL,
   description TEXT NOT NULL DEFAULT '',
-  price NUMERIC(12,2) NOT NULL DEFAULT 0,
-  stock INTEGER NOT NULL DEFAULT 0,
+  price NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (price >= 0),
+  stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
   location TEXT NOT NULL DEFAULT '',
   rating NUMERIC(3,2) NOT NULL DEFAULT 5.0,
   reviews INTEGER NOT NULL DEFAULT 0,
@@ -17,11 +17,20 @@ CREATE TABLE IF NOT EXISTS products (
 CREATE TABLE IF NOT EXISTS customers (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
+  email TEXT,
   phone TEXT,
   password_hash TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Older versions used phone-only accounts. These statements safely upgrade
+-- an existing database without deleting customer data.
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS phone TEXT;
+UPDATE customers SET email = id || '@legacy.local' WHERE email IS NULL OR email = '';
+ALTER TABLE customers ALTER COLUMN email SET NOT NULL;
+ALTER TABLE customers ALTER COLUMN phone DROP NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_lower ON customers (LOWER(email));
 
 CREATE TABLE IF NOT EXISTS payment_info (
   id INTEGER PRIMARY KEY DEFAULT 1,
@@ -37,7 +46,7 @@ CREATE TABLE IF NOT EXISTS orders (
   customer_name TEXT NOT NULL,
   customer_phone TEXT NOT NULL,
   pickup_locations TEXT[] NOT NULL DEFAULT '{}',
-  total NUMERIC(12,2) NOT NULL DEFAULT 0,
+  total NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (total >= 0),
   status TEXT NOT NULL DEFAULT 'tekshirilmoqda',
   receipt TEXT,
   paid_to_card TEXT,
