@@ -21,7 +21,7 @@ function visibleProducts() {
   const query = state.query.toLowerCase();
   return state.products.filter((product) => {
     const categoryMatch = state.category === 'all' || product.cat === state.category;
-    const textMatch = !query || `${product.name} ${product.description || ''}`.toLowerCase().includes(query);
+    const textMatch = !query || `${product.name} ${product.desc || ''}`.toLowerCase().includes(query);
     return categoryMatch && textMatch;
   });
 }
@@ -57,7 +57,7 @@ function renderProducts() {
       <div class="product-card-body">
         <span class="product-category">${CATEGORIES.find((item) => item.id === product.cat)?.label || product.cat}</span>
         <h3>${product.name}</h3>
-        <p>${product.description || ''}</p>
+        <p>${product.desc || ''}</p>
         <div class="product-meta"><strong>${money(product.price)}</strong><span>★ ${product.rating}</span></div>
         <button class="add-product" data-id="${product.id}" ${product.stock <= 0 ? 'disabled' : ''}>
           ${product.stock <= 0 ? 'Tugagan' : 'Savatga qo‘shish'}
