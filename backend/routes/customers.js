@@ -1,87 +1,76 @@
 const express = require('express');
-const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 
-// Регистрация покупателя
+const router = express.Router();
+
+function signCustomer(customer) {
+  return jwt.sign(
+    { sub: customer.id, role: 'customer', email: customer.email, name: customer.name },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+}
+
+function publicCustomer(row) {
+  return { id: row.id, name: row.name, email: row.email, phone: row.phone || null };
+}
+
 router.post('/register', async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ success: false, message: 'Barcha maydonlarni to‘ldiring' });
+    const name = String(req.body.name || '').trim();
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
+
+    if (name.length < 2 || !email || password.length < 6) {
+      return res.status(400).json({ error: 'Ism, email va kamida 6 belgili parol kiriting' });
+    }
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ error: 'JWT_SECRET serverda sozlanmagan' });
     }
 
-    const checkUser = await db.query('SELECT id FROM customers WHERE email = $1', [email]);
-    if (checkUser.rows.length > 0) {
-      return res.status(400).json({ success: false, message: 'Bu email allaqachon ro‘yxatdan o‘tgan' });
+    const existing = await db.query('SELECT id FROM customers WHERE email = $1', [email]);
+    if (existing.rows.length) {
+      return res.status(409).json({ error: 'Bu email allaqachon ro‘yxatdan o‘tgan' });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-
+    const passwordHash = await bcrypt.hash(password, 12);
+    const id = `customer-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const result = await db.query(
-      'INSERT INTO customers (full_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, full_name, email',
-      [fullName, email, passwordHash]
+      `INSERT INTO customers (id, name, email, password_hash)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, email, phone`,
+      [id, name, email, passwordHash]
     );
 
-    const user = result.rows[0];
-    const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.full_name },
-      process.env.JWT_SECRET || 'vermont_secret',
-      { expiresIn: '7d' }
-    );
-
-    res.status(201).json({
-      success: true,
-      message: 'Muvaffaqiyatli ro‘yxatdan o‘tdingiz',
-      token,
-      user
-    });
-  } catch (error) {
-    console.error('Register xatosi:', error);
-    res.status(500).json({ success: false, message: 'Serverda xatolik yuz berdi' });
+    const customer = publicCustomer(result.rows[0]);
+    res.status(201).json({ token: signCustomer(customer), customer });
+  } catch (err) {
+    console.error('Register error:', err.message);
+    res.status(500).json({ error: 'Ro‘yxatdan o‘tishda server xatosi' });
   }
 });
 
-// Авторизация покупателя
 router.post('/login', async (req, res) => {
   try {
-    const { usernameOrEmail, password } = req.body;
-    if (!usernameOrEmail || !password) {
-      return res.status(400).json({ success: false, message: 'Login va parolni kiriting' });
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email va parolni kiriting' });
     }
 
-    const result = await db.query(
-      'SELECT * FROM customers WHERE email = $1 OR full_name = $1',
-      [usernameOrEmail]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(400).json({ success: false, message: 'Foydalanuvchi topilmadi' });
+    const result = await db.query('SELECT * FROM customers WHERE email = $1', [email]);
+    const row = result.rows[0];
+    if (!row || !(await bcrypt.compare(password, row.password_hash))) {
+      return res.status(401).json({ error: 'Email yoki parol noto‘g‘ri' });
     }
 
-    const user = result.rows[0];
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
-      return res.status(400).json({ success: false, message: 'Noto‘g‘ri parol' });
-    }
-
-    const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.full_name },
-      process.env.JWT_SECRET || 'vermont_secret',
-      { expiresIn: '7d' }
-    );
-
-    res.json({
-      success: true,
-      message: 'Tizimga xush kelibsiz',
-      token,
-      user: { id: user.id, fullName: user.full_name, email: user.email }
-    });
-  } catch (error) {
-    console.error('Login xatosi:', error);
-    res.status(500).json({ success: false, message: 'Serverda xatolik yuz berdi' });
+    const customer = publicCustomer(row);
+    res.json({ token: signCustomer(customer), customer });
+  } catch (err) {
+    console.error('Login error:', err.message);
+    res.status(500).json({ error: 'Kirishda server xatosi' });
   }
 });
 

@@ -3,21 +3,26 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT || 4000);
+const allowedOrigin = process.env.FRONTEND_ORIGIN;
 
-app.use(cors());
-app.use(express.json());
+app.use(allowedOrigin ? cors({ origin: allowedOrigin }) : cors());
+app.use(express.json({ limit: '3mb' }));
 
-// Marshrutlar (Routes)
+app.use('/api/auth', require('./routes/adminAuth'));
 app.use('/api/customers', require('./routes/customers'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/stats', require('./routes/stats'));
-app.use('/api/admin', require('./routes/adminAuth'));
-app.use('/api/payment', require('./routes/paymentInfo'));
+app.use('/api/payment-info', require('./routes/paymentInfo'));
 
-app.get('/', (req, res) => {
-  res.send('Vermont Market API Server 2026 ishlab turibdi');
+app.get('/', (_req, res) => {
+  res.json({ ok: true, name: 'Vermont Market API' });
+});
+
+app.use((err, _req, res, _next) => {
+  console.error('Unhandled server error:', err);
+  res.status(500).json({ error: 'Serverda kutilmagan xatolik yuz berdi' });
 });
 
 app.listen(PORT, () => {
