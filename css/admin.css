@@ -1,0 +1,334 @@
+/* =========================================================
+   DASTA — admin panel qo'shimcha uslublari
+   (asosiy tokenlar css/style.css'dan meros qilib olinadi)
+   ========================================================= */
+
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* ---------- stat cards ---------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: grid; place-items: center;
+  background: var(--accent-light);
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.stat-icon svg { width: 17px; height: 17px; }
+
+.stat-label { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.stat-value { font-size: 24px; font-weight: 800; }
+.stat-sub { font-size: 11.5px; color: var(--muted); }
+
+/* ---------- tabs ---------- */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: var(--shadow);
+  width: fit-content;
+  margin-bottom: 18px;
+}
+.admin-tab {
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 7px;
+  color: var(--muted);
+  transition: all 0.15s ease;
+}
+.admin-tab.active { background: var(--accent); color: var(--ink); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---------- panel card ---------- */
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.panel-head h3 { font-size: 16px; }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-primary svg { width: 15px; height: 15px; }
+
+.order-filter-tabs {
+  display: flex;
+  gap: 6px;
+}
+.order-filter-tabs button {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.order-filter-tabs button.active { background: var(--accent-light); color: var(--ink); border-color: var(--accent-light); }
+
+/* ---------- tables ---------- */
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+thead th {
+  text-align: left;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  padding: 12px 20px;
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+tbody tr:hover { background: var(--surface-2); }
+
+.cell-strong { font-weight: 700; }
+.cell-muted { color: var(--muted); font-size: 12.5px; }
+
+.receipt-thumb {
+  width: 44px; height: 44px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  display: block;
+}
+.receipt-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.receipt-thumb:hover { border-color: var(--accent); }
+
+.row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.row-actions button {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+.row-actions .accept { border-color: var(--ink); color: var(--ink); }
+.row-actions .accept:hover { background: var(--ink); color: #fff; }
+.row-actions .ship { border-color: var(--muted); color: var(--muted); border-style: dashed; }
+.row-actions .ship:hover { background: var(--muted); color: #fff; border-style: solid; }
+.row-actions .cancel { border-color: var(--line); color: var(--muted); }
+.row-actions .cancel:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.editable {
+  border: 1px solid transparent;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  width: 90px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.editable:hover, .editable:focus { border-color: var(--line); background: var(--surface-2); outline: none; }
+.editable:focus { border-color: var(--accent); }
+
+.stock-cell.low { color: var(--danger); font-weight: 800; }
+
+.mini-thumb {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--accent);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.mini-thumb svg { width: 20px; height: 20px; }
+.mini-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.name-cell { display: flex; align-items: center; gap: 10px; }
+
+.delete-btn { color: var(--danger); font-size: 11.5px; text-decoration: underline; }
+
+.empty-row td { text-align: center; color: var(--muted); padding: 40px 20px; }
+
+.badge-custom {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-dark);
+  background: var(--accent-light);
+  padding: 2px 6px;
+  border-radius: 5px;
+  margin-left: 6px;
+}
+
+/* ---------- add product modal ---------- */
+#addProductForm { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; max-height: 70vh; overflow-y: auto; }
+
+.field-row { display: flex; gap: 12px; }
+.field-row .field { flex: 1; }
+
+select.editable-select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+@media (max-width: 720px) {
+  thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  tbody tr { border-top: 1px solid var(--line); padding: 10px 0; }
+  tbody td { border-top: none; padding: 4px 20px; }
+  tbody td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+}
+
+/* ---------- admin login gate ---------- */
+.admin-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 20px;
+}
+
+.gate-card {
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.gate-icon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--ink);
+  display: grid; place-items: center;
+  margin-bottom: 8px;
+}
+.gate-icon svg { width: 24px; height: 24px; }
+
+.gate-card h2 { font-size: 18px; margin-bottom: 2px; }
+.gate-card p { font-size: 13px; color: var(--muted); margin: 0 0 14px; }
+
+.gate-card input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.gate-card input:focus { outline: none; border-color: var(--accent); }
+
+.gate-error {
+  color: var(--danger);
+  font-size: 12.5px;
+  margin: -8px 0 12px;
+}
+
+.gate-back {
+  margin-top: 16px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.gate-back:hover { color: var(--ink); text-decoration: underline; }
+
+
+/* Vermont admin ikonka stili */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-brand-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-title h2 {
+  font-size: 1.15rem;
+  margin: 0;
+  color: #fff;
+}
+
+.sidebar-title small {
+  color: #8e8e93;
+  font-size: 0.75rem;
+}
