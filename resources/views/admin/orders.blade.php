@@ -1,0 +1,15 @@
+@extends('layouts.app')
+@section('title', __('Admin · Buyurtmalar'))
+@section('content')
+@php($statusLabels = ['payment_review'=>'Chek tekshirilmoqda','payment_confirmed'=>'To‘lov tasdiqlandi','payment_rejected'=>'To‘lov rad etildi','preparing'=>'Tayyorlanmoqda','delivering'=>'Yetkazilmoqda','completed'=>'Yakunlandi'])
+<section class="page-shell"><p class="eyebrow">VERMONTSHOP · {{ __('ADMIN') }}</p><div class="section-heading"><h1 class="page-title">{{ __('Buyurtmalar') }}</h1><a class="button button-outline" href="{{ route('admin.products.index') }}">{{ __('Mahsulotlarga o‘tish') }}</a></div>
+<div class="admin-orders">@forelse($orders as $order)<article class="admin-order">
+<div class="admin-order-head"><div><strong>#{{ $order->order_number }}</strong><span>{{ $order->user->name }} · {{ $order->phone }}</span></div><b>{{ number_format($order->total,0,',',' ') }} {{ __('so‘m') }}</b></div>
+<p>{{ $order->address }}</p>@if($order->delivery_note)<p>{{ __('delivery.ui.courier_note_admin') }} {{ $order->delivery_note }}</p>@endif
+@foreach($order->items as $item)<small>{{ $item->product_name }} {{ $item->variant }} × {{ $item->quantity }}</small>@endforeach
+@if($order->receipt_path)<a class="receipt-link" href="{{ route('admin.orders.receipt',$order) }}">{{ __('Chekni yuklab olish') }} ↗</a>@endif
+<form class="admin-status-form" method="post" action="{{ route('admin.orders.update',$order) }}">@csrf @method('PATCH')<select name="status">@foreach($statusLabels as $value=>$label)<option value="{{ $value }}" @selected($order->status===$value)>{{ __($label) }}</option>@endforeach</select><input name="admin_note" placeholder="{{ __('Izoh (ixtiyoriy)') }}" value="{{ $order->admin_note }}"><button class="button button-dark">{{ __('delivery.ui.payment_save') }}</button><a class="quiet-link" href="{{ route('orders.show',$order) }}">{{ __('Buyurtmani ochish') }} ↗</a></form>
+<div class="admin-delivery-box"><div class="delivery-admin-heading"><strong>{{ __('delivery.ui.delivery') }}: {{ __('delivery.status.'.$order->delivery_status) }}</strong>@if($order->courier)<span>{{ __('delivery.ui.courier') }}: {{ $order->courier->name }}</span>@endif</div>
+<form class="delivery-assign-form" method="post" action="{{ route('admin.orders.delivery',$order) }}">@csrf<label>{{ __('delivery.ui.admin_assign') }}<input type="email" name="courier_email" value="{{ $order->courier?->email }}" list="courier-list-{{ $order->id }}" placeholder="email@example.com" required></label><datalist id="courier-list-{{ $order->id }}">@foreach($couriers as $courier)<option value="{{ $courier->email }}">{{ $courier->name }}</option>@endforeach</datalist><label>{{ __('delivery.ui.admin_eta') }}<input type="datetime-local" name="estimated_delivery_at" value="{{ $order->estimated_delivery_at?->format('Y-m-d\TH:i') }}"></label><button class="button button-outline">{{ __('delivery.ui.assign_button') }}</button></form>
+<small class="muted-note">{{ __('delivery.ui.role_notice') }}</small></div></article>@empty<div class="empty-state">{{ __('Hozircha buyurtmalar yo‘q.') }}</div>@endforelse</div><div class="pagination">{{ $orders->links() }}</div></section>
+@endsection

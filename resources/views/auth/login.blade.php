@@ -1,0 +1,5 @@
+@extends('layouts.app')
+@section('title', __('Kirish').' — Vermontshop')
+@section('content')
+<section class="auth-wrap"><div class="auth-orb"><div class="auth-card"><p class="eyebrow">VERMONTSHOP {{ __('HISOBI') }}</p><h1>{{ __('Kirish') }}</h1><p class="auth-subtitle">{{ __('Xush kelibsiz. Hisobingizga kiring.') }}</p><form method="post" action="{{ route('login.store') }}">@csrf<label>{{ __('Email') }}</label><input class="auth-input" type="email" name="email" value="{{ old('email') }}" placeholder="siz@gmail.com" required autocomplete="email"><label>{{ __('Parol') }}</label><input class="auth-input" type="password" name="password" placeholder="••••••••" required autocomplete="current-password"><label class="remember"><input type="checkbox" name="remember"> {{ __('Eslab qolish') }}</label><button class="button button-dark full-button">{{ __('Kirish') }}</button></form><p class="auth-bottom">{{ __('Hisobingiz yo‘qmi?') }} <a href="{{ route('register') }}">{{ __('Ro‘yxatdan o‘ting') }}</a></p></div></div></section>
+@endsection
